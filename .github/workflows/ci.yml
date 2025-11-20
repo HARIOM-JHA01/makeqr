@@ -20,8 +20,13 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.60.0
+          version: latest
           args: --timeout=5m
+          install-mode: go
+      - name: Fallback: install golangci-lint via install script
+        if: failure()
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin latest || true
       - name: Run tests
         run: go test ./...
       - name: Vet

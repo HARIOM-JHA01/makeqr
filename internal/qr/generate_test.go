@@ -14,8 +14,14 @@ func TestGenerateFile(t *testing.T) {
         t.Fatalf("failed to create temp file: %v", err)
     }
     path := tmp.Name()
-    tmp.Close()
-    defer os.Remove(path)
+    if err := tmp.Close(); err != nil {
+        t.Fatalf("tmp close: %v", err)
+    }
+    defer func() {
+        if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+            t.Fatalf("remove temp file: %v", err)
+        }
+    }()
 
     if err := GenerateFile("https://example.com", qrcode.Medium, 256, path); err != nil {
         t.Fatalf("GenerateFile returned error: %v", err)
@@ -36,8 +42,14 @@ func TestGeneratedIsPNG(t *testing.T) {
         t.Fatalf("failed to create temp file: %v", err)
     }
     path := tmp.Name()
-    tmp.Close()
-    defer os.Remove(path)
+    if err := tmp.Close(); err != nil {
+        t.Fatalf("tmp close: %v", err)
+    }
+    defer func() {
+        if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+            t.Fatalf("remove temp file: %v", err)
+        }
+    }()
 
     if err := GenerateFile("https://example.com/golden", qrcode.Medium, 256, path); err != nil {
         t.Fatalf("GenerateFile returned error: %v", err)
@@ -47,7 +59,11 @@ func TestGeneratedIsPNG(t *testing.T) {
     if err != nil {
         t.Fatalf("open generated file: %v", err)
     }
-    defer f.Close()
+    defer func() {
+        if err := f.Close(); err != nil {
+            t.Fatalf("close generated file: %v", err)
+        }
+    }()
 
     sig := make([]byte, 8)
     if _, err := io.ReadFull(f, sig); err != nil {
@@ -66,7 +82,11 @@ func TestExampleIsPNG(t *testing.T) {
     if err != nil {
         t.Fatalf("open example png: %v", err)
     }
-    defer f.Close()
+    defer func() {
+        if err := f.Close(); err != nil {
+            t.Fatalf("close example file: %v", err)
+        }
+    }()
 
     sig := make([]byte, 8)
     if _, err := io.ReadFull(f, sig); err != nil {

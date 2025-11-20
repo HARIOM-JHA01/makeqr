@@ -1,3 +1,4 @@
+version: 2
 run:
   timeout: 5m
 
@@ -5,12 +6,9 @@ linters:
   enable:
     - govet
     - errcheck
-    - gofmt
-    - gosimple
     - staticcheck
     - unused
     - bodyclose
-    - revive
 
 issues:
   exclude-use-default: false

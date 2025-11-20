@@ -11,25 +11,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.25
+          go-version: "1.25"
+
       - name: Install dependencies
         run: go mod download
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
           version: latest
           args: --timeout=5m
           install-mode: go
-      - name: Fallback: install golangci-lint via install script
-        if: failure()
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin latest || true
+
       - name: Run tests
         run: go test ./...
+
       - name: Vet
         run: go vet ./...
+
       - name: Build
         run: go build -v ./...
